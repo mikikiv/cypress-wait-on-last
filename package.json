@@ -1,0 +1,47 @@
+{
+	"name": "cypress-wait-on-last",
+	"version": "1.0.0",
+	"description": "Wait for the last matched Cypress alias, with optional validation. Continuously checks the latest matching interception and only returns when valid. Useful for handling unknown request counts or race conditions.",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"repository": {
+		"url": "https://github.com/mikikiv/cypress-wait-on-last.git"
+	},
+	"scripts": {
+		"build": "tsc",
+		"check": "biome check",
+		"fix": "biome check --write",
+		"test": "cypress run",
+		"test:open": "cypress open",
+		"prepublish": "npm run build && npm run test",
+		"version": "npm run build && git add -A dist -f",
+		"postversion": "git push && git push --tags",
+		"clean": "rm -rf dist",
+		"dev": "npm run build && npm run test:open"
+	},
+	"keywords": [
+		"cypress",
+		"cypress-plugin",
+		"interceptions",
+		"testing",
+		"wait",
+		"validation",
+		"waitUntil"
+	],
+	"author": "Mikey Villavicencio",
+	"license": "MIT",
+	"peerDependencies": {
+		"cypress": ">=12.0.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.0.0",
+		"@types/node": "^20.0.0",
+		"cypress": "^14.5.0",
+		"typescript": "^5.8.3"
+	},
+	"packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977"
+}
