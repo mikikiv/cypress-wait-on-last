@@ -1,4 +1,3 @@
-// Import the custom commands
 import "../../support/index";
 import "../../support/commands";
 

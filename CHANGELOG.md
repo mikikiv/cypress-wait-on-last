@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0] - [2025-07-17]
+
+### Enhancements
+
+- Support for chai assertions within the validation function
+- Validation function can now have empty params
+
+### Misc
+
+- Consolidate type definitions
+- Update to Cypress 14.5.2
+- Adds ci/cd configurations
+
 ## [1.0.0] - [2025-06-19]
 
 ### Features

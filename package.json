@@ -16,12 +16,12 @@
 		"check": "biome check",
 		"fix": "biome check --write",
 		"test": "cypress run",
-		"test:open": "cypress open",
+		"test:open": "cypress open --e2e -b electron",
 		"prepublish": "npm run build && npm run test",
 		"version": "npm run build && git add -A dist -f",
 		"postversion": "git push && git push --tags",
 		"clean": "rm -rf dist",
-		"dev": "npm run build && npm run test:open"
+		"dev": "npm run test:open"
 	},
 	"keywords": [
 		"cypress",
@@ -40,8 +40,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "2.0.0",
 		"@types/node": "^20.0.0",
-		"cypress": "^14.5.0",
+		"cypress": "^14.5.2",
 		"typescript": "^5.8.3"
-	},
-	"packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977"
+	}
 }
