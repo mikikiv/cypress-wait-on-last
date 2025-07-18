@@ -1,5 +1,3 @@
-/// <reference types="cypress" />
-
 type TestResponseBody = {
 	status: string;
 	data: string | any[];
@@ -13,14 +11,17 @@ describe("waitOnLast Command", () => {
 	});
 
 	describe("Basic functionality - waiting for requests without validation", () => {
-		it("should wait for matching request when no validation is provided", () => {
-			cy.intercept("GET", "/api/test", {
-				status: "success",
-				data: "test",
+		beforeEach(() => {
+			cy.intercept("GET", "/api/test", (req) => {
+				req.reply({
+					status: "success",
+					data: "test",
+				});
 			}).as("testRequest");
 
 			cy.fetch("/api/test");
-
+		});
+		it("should wait for matching request when no validation is provided", () => {
 			// Wait for the last request without validation
 			cy.waitOnLast<TestResponseBody>("@testRequest").then(({ response }) => {
 				expect(response?.body).to.deep.equal({
@@ -31,15 +32,14 @@ describe("waitOnLast Command", () => {
 		});
 
 		it("should return the last request when requireValidation is false", () => {
+			// Second request
 			cy.intercept("GET", "/api/test", { status: "pending", data: "test" }).as(
 				"testRequest",
 			);
-
-			// Trigger the request
 			cy.fetch("/api/test");
 
 			// Wait for the last request with requireValidation: false
-			cy.waitOnLast<TestResponseBody>("@testRequest", undefined, {
+			cy.waitOnLast<TestResponseBody>("@testRequest", {
 				requireValidation: false,
 			}).then(({ response }) => {
 				expect(response?.body).to.deep.equal({
@@ -51,17 +51,17 @@ describe("waitOnLast Command", () => {
 	});
 
 	describe("Validation functionality", () => {
-		it("should pass when validation returns true", () => {
+		beforeEach(() => {
 			cy.intercept("GET", "/api/test", { status: "success", data: "test" }).as(
 				"testRequest",
 			);
-
-			// Trigger the request
 			cy.fetch("/api/test");
+		});
 
+		it("should pass when validation returns true", () => {
 			// Wait with validation that should pass
 			cy.waitOnLast<TestResponseBody>("@testRequest", (data) => {
-				return data.response?.body?.status === "success";
+				return data?.response?.body?.status === "success";
 			}).then((response) => {
 				expect(response.response?.body).to.deep.equal({
 					status: "success",
@@ -70,8 +70,46 @@ describe("waitOnLast Command", () => {
 			});
 		});
 
+		it("should allow not using a validation parameter", () => {
+			cy.waitOnLast("@testRequest", () => {
+				return true;
+			}).then((data) => {
+				expect(data?.response?.body).to.deep.equal({
+					status: "success",
+					data: "test",
+				});
+			});
+		});
+
+		it("should return the last request when the validation function does not return a boolean", () => {
+			//@ts-expect-error
+			cy.waitOnLast("@testRequest", () => {
+				return { foo: "bar" };
+			}).then((data) => {
+				expect(data?.response?.body).to.deep.equal({
+					status: "success",
+					data: "test",
+				});
+			});
+		});
+
+		it("should only try once if validation is successful", () => {
+			cy.fetch("/api/test");
+			cy.waitOnLast("@testRequest", () => {
+				return true;
+			}).then((data) => {
+				expect(data?.response?.body).to.deep.equal({
+					status: "success",
+					data: "test",
+				});
+			});
+		});
+	});
+
+	describe("Multiple requests handling", () => {
 		it("should retry when validation fails initially but passes later", () => {
 			let callCount = 0;
+			let attempt = 0;
 			cy.intercept("GET", "/api/test", (req) => {
 				callCount++;
 				if (callCount === 1) {
@@ -82,13 +120,14 @@ describe("waitOnLast Command", () => {
 			}).as("testRequest");
 
 			// Trigger multiple requests
-			cy.fetch("/api/test", { count: 2 });
+			cy.fetch("/api/test", { count: 2, delay: 100 });
 
 			// Wait with validation that should eventually pass
 			cy.waitOnLast<TestResponseBody>(
 				"@testRequest",
 				(data) => {
-					return data.response?.body?.status === "success";
+					attempt++;
+					return data?.response?.body?.status === "success";
 				},
 				{ timeout: 300 },
 			).then(({ response }) => {
@@ -96,12 +135,13 @@ describe("waitOnLast Command", () => {
 					status: "success",
 					data: "test",
 				});
+				// more than 1 request was made
 				expect(callCount).to.be.greaterThan(1);
+				// more than 1 attempt to validate
+				expect(attempt).to.be.gt(1);
 			});
 		});
-	});
 
-	describe("Multiple requests handling", () => {
 		it("should return the last request when multiple requests are made", () => {
 			let callCount = 0;
 			cy.intercept("GET", "/api/test", (req) => {
@@ -139,13 +179,13 @@ describe("waitOnLast Command", () => {
 			}).as("testRequest");
 
 			// These requests delay so that they are made after the waitOnLast call
-			cy.fetch("/api/test", { count: 3, delay: 500 });
+			cy.fetch("/api/test", { count: 3, delay: 300 });
 
 			// Wait with validation that should pass on the last request
 			cy.waitOnLast<TestResponseBody>(
 				"@testRequest",
 				(data) => {
-					return data.response?.body?.status === "success";
+					return data?.response?.body?.status === "success";
 				},
 				{ log: true },
 			).then(({ response }) => {
@@ -156,15 +196,16 @@ describe("waitOnLast Command", () => {
 	});
 
 	describe("Display and logging", () => {
-		it("should display custom message in logs", () => {
+		beforeEach(() => {
 			cy.intercept("GET", "/api/test", { status: "success", data: "test" }).as(
 				"testRequest",
 			);
 
 			// Trigger the request
 			cy.fetch("/api/test");
+		});
 
-			// Wait with custom display message
+		it("should display custom message in logs", () => {
 			cy.waitOnLast<TestResponseBody>("@testRequest", {
 				displayMessage: "Custom display message",
 			}).then(({ response }) => {
@@ -176,14 +217,6 @@ describe("waitOnLast Command", () => {
 		});
 
 		it("should log with default alias when no display message is provided", () => {
-			cy.intercept("GET", "/api/test", { status: "success", data: "test" }).as(
-				"testRequest",
-			);
-
-			// Trigger the request
-			cy.fetch("/api/test");
-
-			// Wait without custom display message
 			cy.waitOnLast<TestResponseBody>("@testRequest").then(({ response }) => {
 				expect(response?.body).to.deep.equal({
 					status: "success",
@@ -208,7 +241,8 @@ describe("waitOnLast Command", () => {
 			cy.fetch("/api/test", { count: 2 });
 
 			// Wait with complex validation
-			cy.waitOnLast<TestResponseBody>("@testRequest", ({ response }) => {
+			cy.waitOnLast<TestResponseBody>("@testRequest", (data) => {
+				const response = data?.response;
 				return (
 					response?.body?.status === "success" &&
 					Array.isArray(response?.body?.data) &&
@@ -221,6 +255,21 @@ describe("waitOnLast Command", () => {
 				expect(response?.body?.data).to.have.length(2);
 				expect((response?.body?.data as any[])[0].name).to.equal("John");
 				expect((response?.body?.data as any[])[1].name).to.equal("Jane");
+			});
+		});
+		it("should handle large numbers of requests efficiently", () => {
+			cy.intercept("GET", "/api/test", { status: "success", data: "test" }).as(
+				"testRequest",
+			);
+			cy.fetch("/api/test", { count: 100, delay: 5 });
+
+			const startTime = Date.now();
+			cy.waitOnLast("@testRequest", () => {
+				return true;
+			}).then(({ response }) => {
+				const elapsed = Date.now() - startTime;
+				expect(elapsed).to.be.lessThan(1000); // Should complete quickly
+				expect(response?.body?.status).to.equal("success");
 			});
 		});
 	});

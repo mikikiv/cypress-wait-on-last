@@ -3,7 +3,7 @@ import type { Interception, WaitOptions } from "cypress/types/net-stubbing";
 // Function overloads for different parameter combinations
 const waitOnLast = <T = any>(
 	alias: string,
-	validate: (data: Interception<T>) => boolean,
+	validate?: (data?: Interception<T>) => boolean,
 	options?: {
 		errorMessage?: string;
 		requireValidation?: boolean;
@@ -19,6 +19,9 @@ const waitOnLast = <T = any>(
 	} = options || {};
 
 	const maxAttempts = 60;
+
+	const defaultValidate = () => true;
+	const validationFn = validate || defaultValidate;
 
 	return cy
 		.wait(
@@ -49,7 +52,7 @@ const waitOnLast = <T = any>(
 									attempts++;
 									return getLastRequest({ log: waitOptions.log ?? false });
 								}
-								const valid = validate(lastResponse);
+								const valid = validationFn(lastResponse);
 
 								if (requireValidation && !valid && attempts < maxAttempts) {
 									attempts++;
@@ -69,7 +72,7 @@ const waitOnLast = <T = any>(
 									consoleProps() {
 										return {
 											yielded: lastResponse,
-											validate,
+											validate: validationFn,
 											displayMessage,
 											requireValidation,
 											command: "waitOnLast",
@@ -96,15 +99,14 @@ const waitOnLastOptions = <T = any>(
 		displayMessage?: string;
 	} & Partial<WaitOptions>,
 ): Cypress.Chainable<Interception<T>> => {
-	const validate = () => true;
-	return waitOnLast(alias, validate, options);
+	return waitOnLast(alias, undefined, options);
 };
 
 // Create the final command with both overloads
 const waitOnLastCommand = <T = any>(
 	alias: string,
 	validateOrOptions?:
-		| ((data: Interception<T>) => boolean)
+		| ((data?: Interception<T> | null | undefined) => boolean)
 		| ({
 				errorMessage?: string;
 				requireValidation?: boolean;

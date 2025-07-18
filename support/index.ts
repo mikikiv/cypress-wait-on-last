@@ -5,7 +5,7 @@ declare global {
 		interface Chainable {
 			waitOnLast<T = any>(
 				alias: string,
-				validate: (data: Interception<T>) => boolean,
+				validate?: (data?: Interception<T> | null | undefined) => boolean,
 				options?: {
 					errorMessage?: string;
 					requireValidation?: boolean;

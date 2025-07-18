@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.0] - [$MERGED_DATE]
+
+- Support for chai assertions within the validation function
+- Validation function parameter can now be empty
+- Minor updates to package src
+
 ## [1.0.0] - [2025-06-19]
 
 ### Features
