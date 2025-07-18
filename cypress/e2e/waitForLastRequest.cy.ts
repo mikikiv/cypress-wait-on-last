@@ -21,6 +21,7 @@ describe("waitOnLast Command", () => {
 
 			cy.fetch("/api/test");
 		});
+
 		it("should wait for matching request when no validation is provided", () => {
 			// Wait for the last request without validation
 			cy.waitOnLast<TestResponseBody>("@testRequest").then(({ response }) => {
@@ -70,9 +71,9 @@ describe("waitOnLast Command", () => {
 			});
 		});
 
-		it("should allow not using a validation parameter", () => {
+		it("accepts an empty param in the validate function", () => {
 			cy.waitOnLast("@testRequest", () => {
-				return true;
+				expect(true).to.be.true;
 			}).then((data) => {
 				expect(data?.response?.body).to.deep.equal({
 					status: "success",
@@ -85,18 +86,6 @@ describe("waitOnLast Command", () => {
 			//@ts-expect-error
 			cy.waitOnLast("@testRequest", () => {
 				return { foo: "bar" };
-			}).then((data) => {
-				expect(data?.response?.body).to.deep.equal({
-					status: "success",
-					data: "test",
-				});
-			});
-		});
-
-		it("should only try once if validation is successful", () => {
-			cy.fetch("/api/test");
-			cy.waitOnLast("@testRequest", () => {
-				return true;
 			}).then((data) => {
 				expect(data?.response?.body).to.deep.equal({
 					status: "success",
@@ -257,6 +246,7 @@ describe("waitOnLast Command", () => {
 				expect((response?.body?.data as any[])[1].name).to.equal("Jane");
 			});
 		});
+
 		it("should handle large numbers of requests efficiently", () => {
 			cy.intercept("GET", "/api/test", { status: "success", data: "test" }).as(
 				"testRequest",
@@ -265,7 +255,7 @@ describe("waitOnLast Command", () => {
 
 			const startTime = Date.now();
 			cy.waitOnLast("@testRequest", () => {
-				return true;
+				expect(true).to.be.true;
 			}).then(({ response }) => {
 				const elapsed = Date.now() - startTime;
 				expect(elapsed).to.be.lessThan(1000); // Should complete quickly

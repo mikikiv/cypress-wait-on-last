@@ -1,6 +1,4 @@
 import "./commands";
-import type { Interception, WaitOptions } from "cypress/types/net-stubbing";
-import "../../support";
 
 declare global {
 	namespace Cypress {

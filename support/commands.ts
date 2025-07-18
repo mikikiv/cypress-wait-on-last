@@ -1,15 +1,11 @@
-import type { Interception, WaitOptions } from "cypress/types/net-stubbing";
+import type { Interception } from "cypress/types/net-stubbing";
 
 // Function overloads for different parameter combinations
-const waitOnLast = <T = any>(
-	alias: string,
-	validate?: (data?: Interception<T>) => boolean,
-	options?: {
-		errorMessage?: string;
-		requireValidation?: boolean;
-		displayMessage?: string;
-	} & Partial<WaitOptions>,
-): Cypress.Chainable<Interception<T>> => {
+const waitOnLast = <T = any>({
+	alias,
+	validate,
+	options,
+}: Cypress.WaitOnLastParams<T>): Cypress.Chainable<Interception<T>> => {
 	// Implementation
 	const {
 		requireValidation = true,
@@ -52,16 +48,18 @@ const waitOnLast = <T = any>(
 									attempts++;
 									return getLastRequest({ log: waitOptions.log ?? false });
 								}
+
 								const valid = validationFn(lastResponse);
 
-								if (requireValidation && !valid && attempts < maxAttempts) {
+								const isValid = valid !== false;
+
+								if (requireValidation && !isValid && attempts < maxAttempts) {
 									attempts++;
 									return getLastRequest({ log: waitOptions.log ?? false });
 								}
 
-								if (requireValidation && !valid) {
+								if (requireValidation && !isValid) {
 									if (errorMessage) throw Error(errorMessage);
-
 									throw new Error(`Validation failed for alias "${alias}"`);
 								}
 
@@ -93,36 +91,26 @@ const waitOnLast = <T = any>(
 // Overload for options-only usage
 const waitOnLastOptions = <T = any>(
 	alias: string,
-	options?: {
-		errorMessage?: string;
-		requireValidation?: boolean;
-		displayMessage?: string;
-	} & Partial<WaitOptions>,
+	options?: Cypress.WaitOnLastOptions,
 ): Cypress.Chainable<Interception<T>> => {
-	return waitOnLast(alias, undefined, options);
+	return waitOnLast({ alias, options });
 };
 
 // Create the final command with both overloads
 const waitOnLastCommand = <T = any>(
 	alias: string,
-	validateOrOptions?:
-		| ((data?: Interception<T> | null | undefined) => boolean)
-		| ({
-				errorMessage?: string;
-				requireValidation?: boolean;
-				displayMessage?: string;
-		  } & Partial<WaitOptions>),
-	options?: {
-		errorMessage?: string;
-		requireValidation?: boolean;
-		displayMessage?: string;
-	} & Partial<WaitOptions>,
+	validateOrOptions?: Cypress.WaitOnLastValidate<T> | Cypress.WaitOnLastOptions,
+	options?: Cypress.WaitOnLastOptions,
 ): Cypress.Chainable<Interception<T>> => {
 	// Allow the second parameter to be a function or options
 	const isValidateFunction = typeof validateOrOptions === "function";
 
 	if (isValidateFunction) {
-		return waitOnLast(alias, validateOrOptions, options);
+		return waitOnLast({
+			alias,
+			validate: validateOrOptions,
+			options,
+		});
 	} else {
 		return waitOnLastOptions(alias, validateOrOptions);
 	}
