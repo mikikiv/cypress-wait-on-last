@@ -1,23 +1,20 @@
-name: CI - Cypress E2E
+name: Cypress Tests
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [synchronize, opened, reopened]
 
 jobs:
   cypress-run:
-    runs-on: ubuntu-latest
-    container:
-      image: cypress/included:14.5.2-node-22.17.1-chrome-138.0.7204.157-1-ff-140.0.4-edge-138.0.3351.83-1
+    runs-on: ubuntu-24.04
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Run Cypress tests
-        run: npm test
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          build: npm run build
