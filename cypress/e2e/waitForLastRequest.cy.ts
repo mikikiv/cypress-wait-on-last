@@ -258,7 +258,7 @@ describe("waitOnLast Command", () => {
         expect(true).to.be.true;
       }).then(({ response }) => {
         const elapsed = Date.now() - startTime;
-        expect(elapsed).to.be.lessThan(10500); // Should complete quickly
+        expect(elapsed).to.be.lessThan(1500); // Should complete quickly
         expect(response?.body?.status).to.equal("success");
       });
     });
