@@ -38,10 +38,7 @@ cy.intercept("GET", "/api/data").as("getData");
 
 // Wait for the request and validate the response
 cy.waitOnLast("@getData", (data) => {
-  return (
-    data.response?.body?.status === "success" &&
-    data.response?.body?.items.length > 0
-  );
+  expect(data.response.body.status).to.eq("success");
 });
 ```
 
