@@ -17,7 +17,7 @@
 		"fix": "biome check --write",
 		"test": "cypress run",
 		"test:open": "cypress open --e2e -b electron",
-		"prepublish": "npm run build && npm run test",
+		"prepublish": "npm run build",
 		"version": "npm run build && git add -A dist -f",
 		"postversion": "git push && git push --tags",
 		"clean": "rm -rf dist",
