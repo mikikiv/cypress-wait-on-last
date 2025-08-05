@@ -5,5 +5,6 @@ export default defineConfig({
     setupNodeEvents(_on, _config) {},
     watchForFileChanges: true,
     defaultBrowser: "electron",
+    projectId: "z9f1hi",
   },
 });
