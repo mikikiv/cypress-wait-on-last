@@ -20,9 +20,8 @@
 ### Internal
 
 - Refactor command function implementation to use proper TypeScript function declarations
-- Improve TypeScript overload definitions for better IntelliSense support
-- Eliminate redundant helper function to reduce code duplication
-- Remove unnecessary type assertions for cleaner type safety
+- Remove redundant helper function to reduce code duplication
+- Remove Cypress tests from being included in the dist folder
 
 ## [1.1.0] - [2025-07-17]
 
