@@ -79,12 +79,8 @@ const waitOnLast = ({ alias, validate, options, }) => {
         });
     });
 };
-// Overload for options-only usage
-const waitOnLastOptions = (alias, options) => {
-    return waitOnLast({ alias, options });
-};
 // Create the final command with both overloads
-const waitOnLastCommand = (alias, validateOrOptions, options) => {
+function waitOnLastCommand(alias, validateOrOptions, options) {
     // Allow the second parameter to be a function or options
     const isValidateFunction = typeof validateOrOptions === "function";
     if (isValidateFunction) {
@@ -95,7 +91,10 @@ const waitOnLastCommand = (alias, validateOrOptions, options) => {
         });
     }
     else {
-        return waitOnLastOptions(alias, validateOrOptions);
+        return waitOnLast({
+            alias,
+            options: validateOrOptions,
+        });
     }
-};
+}
 Cypress.Commands.add("waitOnLast", waitOnLastCommand);

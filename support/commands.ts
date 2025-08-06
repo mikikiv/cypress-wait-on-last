@@ -88,20 +88,23 @@ const waitOnLast = <T = any>({
     });
 };
 
-// Overload for options-only usage
-const waitOnLastOptions = <T = any>(
+function waitOnLastCommand<T = any>(
+  alias: string,
+  validate?: Cypress.WaitOnLastValidate<T>,
+  options?: Cypress.WaitOnLastOptions,
+): Cypress.Chainable<Interception<T>>;
+
+function waitOnLastCommand<T = any>(
   alias: string,
   options?: Cypress.WaitOnLastOptions,
-): Cypress.Chainable<Interception<T>> => {
-  return waitOnLast({ alias, options });
-};
+): Cypress.Chainable<Interception<T>>;
 
 // Create the final command with both overloads
-const waitOnLastCommand = <T = any>(
+function waitOnLastCommand<T = any>(
   alias: string,
   validateOrOptions?: Cypress.WaitOnLastValidate<T> | Cypress.WaitOnLastOptions,
   options?: Cypress.WaitOnLastOptions,
-): Cypress.Chainable<Interception<T>> => {
+): Cypress.Chainable<Interception<T>> {
   // Allow the second parameter to be a function or options
   const isValidateFunction = typeof validateOrOptions === "function";
 
@@ -112,8 +115,11 @@ const waitOnLastCommand = <T = any>(
       options,
     });
   } else {
-    return waitOnLastOptions(alias, validateOrOptions);
+    return waitOnLast({
+      alias,
+      options: validateOrOptions,
+    });
   }
-};
+}
 
-Cypress.Commands.add("waitOnLast", waitOnLastCommand as any);
+Cypress.Commands.add("waitOnLast", waitOnLastCommand);
