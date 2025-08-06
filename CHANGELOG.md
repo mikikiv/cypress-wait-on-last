@@ -7,10 +7,13 @@
 - Fix Chai assertion handling in validation functions - exceptions are now properly caught and treated as validation failures
 - Improve retry behavior when validation functions throw errors instead of returning false
 
-### Tests
+### Internal
 
 - Add test case for Chai assertion validation with delayed requests
 - Improve test coverage for validation error scenarios
+- Reduce /dist file size even more by removing a duplicate support folder
+- Remove /dist from being included in git
+- Added tsconfig file for the internal Cypress tests
 
 ## [1.1.1] - [2025-08-06]
 
