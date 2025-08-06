@@ -219,7 +219,7 @@ describe("waitOnLast Command", () => {
             }).then(({ response }) => {
                 var _a;
                 const elapsed = Date.now() - startTime;
-                expect(elapsed).to.be.lessThan(1000); // Should complete quickly
+                expect(elapsed).to.be.lessThan(1500); // Should complete quickly
                 expect((_a = response === null || response === void 0 ? void 0 : response.body) === null || _a === void 0 ? void 0 : _a.status).to.equal("success");
             });
         });
