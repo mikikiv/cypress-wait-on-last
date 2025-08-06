@@ -12,6 +12,6 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["cypress", "node"]
   },
-  "include": ["support/**/*"],
+  "include": ["./support/**/*"],
   "exclude": ["node_modules", "dist"]
 }

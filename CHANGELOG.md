@@ -1,12 +1,25 @@
 # Changelog
 
+## [1.1.2] - [2025-08-06]
+
+### Bug Fixes
+
+- Fix Chai assertion handling in validation functions - exceptions are now properly caught and treated as validation failures
+- Improve retry behavior when validation functions throw errors instead of returning false
+
+### Tests
+
+- Add test case for Chai assertion validation with delayed requests
+- Improve test coverage for validation error scenarios
+
 ## [1.1.1] - [2025-08-06]
 
 ### Internal
 
 - Refactor command function implementation to use proper TypeScript function declarations
-- Remove redundant helper function to reduce code duplication
-- Remove Cypress tests from being included in the dist folder
+- Improve TypeScript overload definitions for better IntelliSense support
+- Eliminate redundant helper function to reduce code duplication
+- Remove unnecessary type assertions for cleaner type safety
 
 ## [1.1.0] - [2025-07-17]
 
