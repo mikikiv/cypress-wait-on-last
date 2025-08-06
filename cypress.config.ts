@@ -7,4 +7,8 @@ export default defineConfig({
     defaultBrowser: "electron",
     projectId: "z9f1hi",
   },
+  retries: {
+    runMode: 2,
+    openMode: 0,
+  },
 });
