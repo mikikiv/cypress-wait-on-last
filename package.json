@@ -18,7 +18,7 @@
 		"test": "cypress run",
 		"test:open": "cypress open --e2e -b electron",
 		"prepublish": "npm run build",
-		"version": "npm run build && git add -A dist -f",
+		"version": "npm run build",
 		"postversion": "git push && git push --tags",
 		"clean": "rm -rf dist",
 		"dev": "npm run test:open"

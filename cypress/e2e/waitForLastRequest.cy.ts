@@ -182,6 +182,33 @@ describe("waitOnLast Command", () => {
         expect(response?.body?.status).to.equal("success");
       });
     });
+
+    it("should validate against requests made after waitOnLast is called when using Chai assertions", () => {
+      let callCount = 0;
+      cy.intercept("GET", "/api/test", (req) => {
+        callCount++;
+        req.reply({
+          status: callCount >= 3 ? "success" : "pending",
+          data: "test",
+          requestNumber: callCount,
+        });
+      }).as("testRequest");
+
+      // These requests delay so that they are made after the waitOnLast call
+      cy.fetch("/api/test", { count: 3, delay: 300 });
+
+      // Wait with validation that should pass on the last request
+      cy.waitOnLast<TestResponseBody>(
+        "@testRequest",
+        (data) => {
+          expect(data?.response?.body?.status).to.eq("success");
+        },
+        { log: true },
+      ).then(({ response }) => {
+        expect(response?.body?.requestNumber).to.equal(3);
+        expect(response?.body?.status).to.equal("success");
+      });
+    });
   });
 
   describe("Display and logging", () => {

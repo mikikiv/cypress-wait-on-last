@@ -49,9 +49,14 @@ const waitOnLast = <T = any>({
                   return getLastRequest({ log: waitOptions.log ?? false });
                 }
 
-                const valid = validationFn(lastResponse);
+                let isValid = false;
 
-                const isValid = valid !== false;
+                try {
+                  const valid = validationFn(lastResponse);
+                  isValid = valid !== false;
+                } catch (_error) {
+                  isValid = false;
+                }
 
                 if (requireValidation && !isValid && attempts < maxAttempts) {
                   attempts++;
