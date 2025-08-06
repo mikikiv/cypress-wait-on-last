@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1] - [2025-08-06]
+
+### Internal
+
+- Refactor command function implementation to use proper TypeScript function declarations
+- Remove redundant helper function to reduce code duplication
+- Remove Cypress tests from being included in the dist folder
+
 ## [1.1.0] - [2025-07-17]
 
 ### Enhancements
