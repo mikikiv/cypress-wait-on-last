@@ -1,6 +1,6 @@
 {
 	"name": "cypress-wait-on-last",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "Wait for the last matched Cypress alias, with optional validation. Continuously checks the latest matching interception and only returns when valid. Useful for handling unknown request counts or race conditions.",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
